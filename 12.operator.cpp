@@ -25,7 +25,7 @@ public:
     //返回对象的引用:为了一直使用这个cin对象，避免再拷贝一份
     istream &operator>>(int &n) {
         //参数传引用，避免再拷贝一份n
-        std::cin >> n;
+        std::cin >> n; //可以用scanf来实现
         return *this;
     }
 private:
