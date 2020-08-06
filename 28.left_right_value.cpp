@@ -46,6 +46,14 @@ void f(int &&x) {
     TEST(move(x), f2); //强制变成右值
 }
 
+
+int test_func(const int &&x) {
+    //x += 1;
+    cout << x << endl;
+    return 0;
+}
+
+
 int main() {
     //表达式的返回结果可以放在等号左边则为左值
     int a, b = 1, c = 3;
@@ -63,5 +71,8 @@ int main() {
     TEST(b + c, f);
     TEST(a++, f);
     TEST(++a, f);
+
+    test_func(123);
+    test_func(move(a));
     return 0;
 }
