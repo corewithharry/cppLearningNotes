@@ -157,6 +157,60 @@ T test_param_func(U a) {
 void func2(int (*func)(double)) {
     cout << func(2.3) << endl;
 }
+/*****************************************************/
+
+
+/*************************标准类型转换模板************************/
+
+//remove_reference模板类将T的引用去掉，变成普通的类型
+template<typename T> struct remove_reference { typedef T type; };
+template<typename T> struct remove_reference<T &> { typedef T type; };
+template<typename T> struct remove_reference<T &&> { typedef T type; };
+
+// add_const
+template<typename T> struct add_const { typedef const T type; };
+template<typename T> struct add_const<const T> { typedef const T type; };
+
+// add_lvalue_reference
+template<typename T> struct add_lvalue_reference { typedef T &type; };
+template<typename T> struct add_lvalue_reference<T &> { typedef T &type; };
+template<typename T> struct add_lvalue_reference<T &&> { typedef T &type; };
+
+
+// add_rvalue_reference
+template<typename T> struct add_rvalue_reference { typedef T&& type; };
+template<typename T> struct add_rvalue_reference<T &> { typedef  T&& type; };
+template<typename T> struct add_rvalue_reference<T &&> { typedef T&& type; };
+
+
+// add_lvalue_reference
+template<typename T> struct remove_pointer { typedef T type; };
+template<typename T> struct remove_pointer<T *> { typedef typename remove_pointer<T>::type type; };
+
+
+//move 函数的实现
+template<typename T>
+typename add_rvalue_reference<T>::type move(T &&a) {
+    return typename add_rvalue_reference<T>::type(a);
+}
+void f(int &x) {
+    cout << "f : left value" << endl;
+    return ;
+}
+void f(int &&x) {
+    cout << "f : right value" << endl;
+    return ;
+}
+
+
+template<typename T>
+typename remove_reference<T>::type add2(T &&a, T &&b) {
+    typename remove_reference<T>::type c = a + b;
+    return c;
+}
+/***********************************************************************/
+
+
 
 } // END OF haizei
 
@@ -166,6 +220,9 @@ void func2(int (*func)(double)) {
 
 
 int main() {
+    int inta = 123, intb = 456;
+    cout << haizei::add2(inta, intb) << endl;
+    cout << haizei::add2(123, 456) << endl;
     haizei::func2(haizei::test_param_func);
     A a(1000);
     B b(646);
@@ -213,5 +270,10 @@ int main() {
     haizei::Test<int(int, int, int, int, int)> f5;
     cout << f5(1, 2, 3, 4, 5) << endl; //累加求和
 
+
+    //move函数测试
+    haizei::f(n);
+    haizei::f(haizei::move(n));
+    //cout << n << endl;
     return 0;
 }
