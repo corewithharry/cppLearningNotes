@@ -22,26 +22,24 @@ public:
     A(int x) : x(x) {}
     int x;
 };
-
-
 class B {
 public:
     B(int y) : y(y) {}
     int y;
 };
-
 int operator+(const A &a, const B &b) {
     return a.x + b.y;
 }
 
+
 namespace haizei {
+/*********************函数模板+特化+偏特化+返回值后置*****************************/
 template<typename T, typename U>
 //decltype(T() + U()) add(T a, U b ) {
 // 当T 和 U 没有默认的构造函数的时候就会报错，下面这样写就解决了
 auto add(T a, U b ) -> decltype(a + b) {
     return a + b;
 }
-
 //特化函数模板
 template<>
 int add(int a, int b) {
@@ -53,10 +51,11 @@ template<typename T, typename U>
 auto add(T *a, U *b) -> decltype(*a + *b) {
     return add(*a, *b); //防止a, b是多重指针
 }
+/************************************************************************************/
 
 
 
-
+/*****用返回值后置完善标准库中的 max 和 min ***************************************/
 template<typename T, typename U>
 auto max(T a, U b) -> decltype(a + b) {
     return (a < b ? b : a);
@@ -66,7 +65,7 @@ template<typename T, typename U>
 auto min(T a, U b) -> decltype(a + b) {
     return (a < b ? a : b);
 }
-
+/********************************************************************************/
     
 
 class PrintAny {
@@ -77,8 +76,7 @@ public:
     }
 };
 
-
-
+/*****************类模板和类模板特化**********************/
 template<typename T>
 class FoolPrintAny {
 public:
@@ -86,16 +84,18 @@ public:
         cout << a << endl;
     }   
 };
-template<>
+template<> //特化
 class FoolPrintAny<int> {
 public:
     void operator()(const int &a) {
         cout << "naughty : " << 2 * a << endl;
     }   
 };
+/******************************************************/
 
 
-//变参模板函数
+
+//**************************************变参模板函数*************/
 template<typename T> //变参模板函数边界，这个放上面
 void printAny(const T &a) {
     cout << a << " " << endl;
@@ -107,6 +107,8 @@ void printAny(const T &a, ARGS...args) {
     printAny(args...);
     return ;
 }
+/***************************************************************/
+
 
 
 
@@ -127,8 +129,6 @@ struct ARG<T> {
 //***************************************************************************
 
 
-
-
 //变参模板类
 //设计一个模板类ARG来解析变参类型
 template<typename T, typename ...ARGS> class Test;
@@ -143,7 +143,8 @@ public:
     }
 };
 
-}
+
+} //end of haizei::
 
 
 int main() {
