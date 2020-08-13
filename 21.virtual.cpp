@@ -109,7 +109,9 @@ int main() {
     temp_b.x = 10000;
     temp_a.say(67);
     A temp_c = retA();
+    
     ((func **)(&temp_a))[0][0](&temp_b, 6);
+    
     srand(time(0));
     Cat a;
     Animal &b = a;
