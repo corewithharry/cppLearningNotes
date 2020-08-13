@@ -95,7 +95,7 @@ public:
 
 
 
-//**************************************变参模板函数*************/
+//**************************************变参函数模板*************/
 template<typename T> //变参模板函数边界，这个放上面
 void printAny(const T &a) {
     cout << a << " " << endl;
@@ -180,7 +180,7 @@ int main() {
 
     int n = 45, m = 57;
     int *p = &n, *q = &m;
-    cout << haizei::add(n, m) << endl; //调用特化模板函数
+    cout << haizei::add(n, m) << endl; //调用特化函数模板
     cout << haizei::add(p, q) << endl; 
 
     haizei::printAny(123, 34.5, "hello world", &a);
