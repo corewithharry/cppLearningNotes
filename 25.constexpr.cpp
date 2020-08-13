@@ -36,7 +36,7 @@ int main() {
     
     int b;
     cin >> b;
-    const int c = 2 * b; //const: 运行期状态
+    const int c = 2 * b; //const: 运行期状态, 这里发现编译的时候是不确定c的值的
 
     int n;
     cin >> n;
