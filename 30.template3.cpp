@@ -148,7 +148,7 @@ private:
     }
 };
 
-/**************模板函数作为参数传递是，自动类型推导**/
+/**************模板函数作为参数传递时，自动类型推导**/
 template<typename T, typename U>
 T test_param_func(U a) {
     return T(a * 2);
