@@ -53,3 +53,30 @@
 
 注 2：本项目作业需要你独立完成，使用他人提供的代码进行提交（无论是否为最高分提交）都将被视为违背学术纯洁性的行为。更多信息请参考《学术准则》。
 
+
+
+---
+
+
+
+## 分析
+
+ ![3F6Wn.png](https://wx2.sbimg.cn/2020/08/22/3F6Wn.png)
+
+### `Parser.cpp`
+
+ ![3VKyM.png](https://wx2.sbimg.cn/2020/08/22/3VKyM.png)
+
+以空格分开
+
+把字符串第一个字符串提取出作为`token`
+
+后面的每个部分`push`到`arguments`中
+
+
+
+### `handler.cpp`中的`BinaryFactor::CreateExpr`
+
+看主函数`(* 1 2 3)` 会被解析成`(* (* 1 2) 3)`
+
+ ![3VZeR.png](https://wx2.sbimg.cn/2020/08/22/3VZeR.png)
