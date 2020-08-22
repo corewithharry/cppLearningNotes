@@ -18,50 +18,39 @@ shared_ptr<Expr> Parse(const char*& expression, ExprHandler* handler) {
 			}
 		}
 		bool forInvoke = true;
-		if (token == "+" || token == "-" || token == "*" || token == "/")
-		{
+		if (token == "+" || token == "-" || token == "*" || token == "/") {
 			forInvoke = false;
 		}
-		while (true)
-		{
-			if (handler->Test(token, forInvoke))
-			{
+		while (true) {
+			if (handler->Test(token, forInvoke)) {
 				expression = Read;
-				if (arguments.size()==0&&!forInvoke)
-				{
+				if (arguments.size()==0&&!forInvoke) {
 					throw Exception{ Read, "Syntax Error" };
 				}
 				return handler->factory->CreateExpr(token, arguments);
 			}
-			else
-			{
+			else {
 				handler = handler->next;
 			}
-			if (handler == nullptr)
-			{
+			if (handler == nullptr) {
 				throw Exception{ Read, "Syntax Error" };
 			}
 		}
 	} else {
 		string token;
-		while (*Read != ' '&&*Read != '\0'&&*Read != ')')
-		{
+		while (*Read != ' '&&*Read != '\0'&&*Read != ')') {
 			token += *Read;
 			Read++;
 		}
-		while (true)
-		{
-			if (handler->Test(token, false))
-			{
+		while (true) {
+			if (handler->Test(token, false)) {
 				expression = Read;
 				return handler->factory->CreateExpr(token, {});
 			}
-			else
-			{
+			else {
 				handler = handler->next;
 			}
-			if (handler == nullptr)
-			{
+			if (handler == nullptr) {
 				throw Exception{ Read, "Syntax Error" };
 			}
 		}
