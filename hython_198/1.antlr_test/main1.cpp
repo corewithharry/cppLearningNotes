@@ -114,6 +114,16 @@ int ExprTreeEvaluator::run(pANTLR3_BASE_TREE tree)
             }
             return init_val;
         } break;
+        
+        //作用域解析
+        case BLOCK: {
+            
+        
+        
+        } break; 
+        
+            
+            
         case ASSIGN: {
             string var(getText(getChild(tree,0)));
             get_param(var);
@@ -121,6 +131,8 @@ int ExprTreeEvaluator::run(pANTLR3_BASE_TREE tree)
             memory[var] = val;
             return val;
         }
+
+
         default:
             cout << "Unhandled token: #" << tok->type << '\n';
             return -1;
