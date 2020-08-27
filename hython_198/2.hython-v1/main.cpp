@@ -10,6 +10,7 @@
 #include <map>
 #include <string>
 #include <iostream>
+#include <AST.h>
 using std::map;
 using std::string;
 using std::cout;
@@ -20,50 +21,30 @@ class ExprTreeEvaluator {
 public:
     ExprTreeEvaluator() : next(nullptr) {}
     ExprTreeEvaluator(ExprTreeEvaluator *next) : next(next) {}
-    int run(pANTLR3_BASE_TREE);
+    int run(haizei::ASTNode);
     void def_param(string, int);
     void set_param(string, int);
     int get_param(string);
     ExprTreeEvaluator *next;
 };
 
-pANTLR3_BASE_TREE getChild(pANTLR3_BASE_TREE, unsigned);
-const char* getText(pANTLR3_BASE_TREE tree);
 
-int main(int argc, char* argv[])
-{
-  pANTLR3_INPUT_STREAM input;
-  phythonLexer lex;
-  pANTLR3_COMMON_TOKEN_STREAM tokens;
-  phythonParser parser;
+int main(int argc, char* argv[]) {
+    assert(argc > 1);
+    haizei::ASTNode tree(argv[1]);
 
-  assert(argc > 1);
-  input = antlr3FileStreamNew((pANTLR3_UINT8)argv[1],ANTLR3_ENC_8BIT);
-  lex = hythonLexerNew(input);
-  tokens = antlr3CommonTokenStreamSourceNew(ANTLR3_SIZE_HINT,
-                                            TOKENSOURCE(lex));
-  parser = hythonParserNew(tokens);
-
-  hythonParser_prog_return r = parser->prog(parser);
-  pANTLR3_BASE_TREE tree = r.tree;
-
-  ExprTreeEvaluator eval;
-  int rr = eval.run(tree);
-  cout << "Evaluator result: " << rr << '\n';
-
-  parser->free(parser);
-  tokens->free(tokens);
-  lex->free(lex);
-  input->close(input);
-
-  return 0;
+    ExprTreeEvaluator eval;
+    int rr = eval.run(tree);
+    cout << "Evaluator result: " << rr << '\n';
+    tree.destroy();
+    return 0;
 }
 
 void ExprTreeEvaluator::def_param(string name, int val) {
     if (memory.find(name) != memory.end()) {
         #ifdef DEBUG
         for (auto x : memory) {
-            cout << "debug log(memory): "x.first << " " << x.second << endl;
+            cout << "debug log(memory): " << x.first << " " << x.second << endl;
         }
         #endif
         throw std::runtime_error("param redefined : " + name);
@@ -92,52 +73,48 @@ int ExprTreeEvaluator::get_param(string name) {
     return memory[name];
 }
 
-int ExprTreeEvaluator::run(pANTLR3_BASE_TREE tree)
-{
-    pANTLR3_COMMON_TOKEN tok = tree->getToken(tree);
-    if(tok) {
-        switch(tok->type) {
+int ExprTreeEvaluator::run(haizei::ASTNode tree) {
+    if(tree.hasToken()) {
+        switch(tree.type()) {
         case INT: {
-            const char* s = getText(tree);
+            string s = tree.text();
             if(s[0] == '~') {
-                return -atoi(s+1);
+                return -atoi(s.c_str() + 1);
             }
             else {
-                return atoi(s);
+                return atoi(s.c_str());
             }
         }
         case ID: {
-            string var(getText(tree));
-            return get_param(var);
+            return get_param(tree.text());
         }
         case PLUS:
-            return run(getChild(tree,0)) + run(getChild(tree,1));
+            return run(tree[0]) + run(tree[1]);
         case MINUS:
-            return run(getChild(tree,0)) - run(getChild(tree,1));
+            return run(tree[0]) - run(tree[1]);
         case TIMES:
-            return run(getChild(tree,0)) * run(getChild(tree,1));
+            return run(tree[0]) * run(tree[1]);
         case DIV:
-            return run(getChild(tree,0)) / run(getChild(tree,1));
+            return run(tree[0]) / run(tree[1]);
         case MOD:
-            return run(getChild(tree,0)) % run(getChild(tree,1));
+            return run(tree[0]) % run(tree[1]);
         case BLOCK: {
             ExprTreeEvaluator new_this(this);
-            int k = tree->getChildCount(tree);
+            int k = tree.size();
             for (int i = 0; i < k; i++) {
-                int val = new_this.run(getChild(tree, i));
+                int val = new_this.run(tree[i]);
                 cout << "Block Value : " << val << endl;
             }
             return 0;
         }
         case DEF: {
-            int k = tree->getChildCount(tree);
+            int k = tree.size();
             int init_val = 0;
             for (int i = 0; i < k; i++) {
-                pANTLR3_BASE_TREE child = getChild(tree, i);
-                string var(getText(child));
+                string var(tree[i].text());
                 init_val = 0;
-                if (child->getChildCount(child) == 1) {
-                    init_val = run(getChild(child, 0));
+                if (tree[i].size() == 1) {
+                    init_val = run(tree[i][0]);
                 }
                 cout << "def param val : " << var << " = " << init_val << endl;
                 this->def_param(var, init_val);
@@ -145,37 +122,25 @@ int ExprTreeEvaluator::run(pANTLR3_BASE_TREE tree)
             return init_val;
         } break;
         case ASSIGN: {
-            string var(getText(getChild(tree,0)));
+            string var(tree[0].text());
             get_param(var);
-            int val = run(getChild(tree,1));
+            int val = run(tree[1]);
             set_param(var, val);
             return val;
         }
         default:
-            cout << "Unhandled token: #" << tok->type << '\n';
+            cout << "Unhandled token: #" << tree.type() << '\n';
             return -1;
         }
-    }
-    else {
-        int k = tree->getChildCount(tree);
+    } else {
+        int k = tree.size();
         int r = 0;
         for(int i = 0; i < k; i++) {
-            r = run(getChild(tree, i));
+            r = run(tree[i]);
             cout << "Evaluator result: " << r << endl;
         }
         return r;
     }
     return 0;
-}
-
-pANTLR3_BASE_TREE getChild(pANTLR3_BASE_TREE tree, unsigned i)
-{
-    assert(i < tree->getChildCount(tree));
-    return (pANTLR3_BASE_TREE) tree->getChild(tree, i);
-}
-
-const char* getText(pANTLR3_BASE_TREE tree)
-{
-    return (const char*) tree->getText(tree)->chars;
 }
 
