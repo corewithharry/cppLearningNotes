@@ -18,9 +18,14 @@ using std::endl;
 class ExprTreeEvaluator {
     map<string,int> memory;
 public:
+    ExprTreeEvaluator(){} 
+    ExprTreeEvaluator(ExprTreeEvaluator *father) {
+        this->father = father;
+    }
     int run(pANTLR3_BASE_TREE);
     void set_param(string, int);
     int get_param(string);
+    ExprTreeEvaluator *father;
 };
 
 pANTLR3_BASE_TREE getChild(pANTLR3_BASE_TREE, unsigned);
@@ -46,7 +51,7 @@ cout << "done" << endl;
 
   ExprTreeEvaluator eval;
   int rr = eval.run(tree);
-  cout << "Evaluator result: " << rr << '\n';
+  //cout << "Evaluator result: " << rr << '\n';
 
   parser->free(parser);
   tokens->free(tokens);
@@ -57,18 +62,31 @@ cout << "done" << endl;
 }
 
 void ExprTreeEvaluator::set_param(string name, int val) {
-    if (memory.find(name) != memory.end()) {
+    /*if (memory.find(name) != memory.end()) {
         throw std::runtime_error("param redefined : " + name);
     }
-    memory[name] = val;
+    memory[name] = val;*/
+    if (memory.find(name) != memory.end()) {
+        memory[name] = val;
+    }
+    if (this->father) this->father->set_param(name, val);
+    throw std::runtime_error("param redefined : " + name);
     return ;
 }
 
 int ExprTreeEvaluator::get_param(string name) {
+    if (memory.find(name) != memory.end()) {
+        return memory[name];
+    }
+    if (this->father) return this->father->get_param(name);
+    throw std::runtime_error("unknown param : " + name);
+    /*
     if (memory.find(name) == memory.end()) {
         throw std::runtime_error("unknown param : " + name);
     }
     return memory[name];
+    */
+    return 0;
 }
 
 int ExprTreeEvaluator::run(pANTLR3_BASE_TREE tree)
@@ -115,25 +133,28 @@ int ExprTreeEvaluator::run(pANTLR3_BASE_TREE tree)
             return init_val;
         } break;
         
-        //作用域解析
+        //作用域
         case BLOCK: {
-            
-        
-        
+            ExprTreeEvaluator child_block(this);
+            int k = tree->getChildCount(tree);
+            int r = 0;
+            for(int i = 0; i < k; i++) {
+                r = child_block.run(getChild(tree, i));
+                cout << "Evaluator result: " << r << endl;
+            }
+            return r;
         } break; 
-        
-            
-            
+
         case ASSIGN: {
             string var(getText(getChild(tree,0)));
             get_param(var);
             int val = run(getChild(tree,1));
-            memory[var] = val;
+            //memory[var] = val;
+            this->set_param(var, val);
             return val;
         }
 
-
-        default:
+        default: 
             cout << "Unhandled token: #" << tok->type << '\n';
             return -1;
         }
