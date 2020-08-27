@@ -54,11 +54,14 @@ ASSIGN: '=';
  
 prog
     : (stmt {
-        #ifdef INFOMSG
-        pANTLR3_STRING s = $stmt.tree->toStringTree($stmt.tree);
-             assert(s->chars);
-             printf(" haizei tree \%s\n", s->chars);
+        #ifdef DDEBUG 
+        do {
+            pANTLR3_STRING s = $stmt.tree->toStringTree($stmt.tree);
+            if (s->chars == NULL) break;
+            assert(s->chars);
+            printf(" haizei tree \%s\n", s->chars);
             fflush(stdout);
+        } while(0);
         #endif    
         }
         )+
