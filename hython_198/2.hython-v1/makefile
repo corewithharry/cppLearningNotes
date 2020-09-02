@@ -1,10 +1,10 @@
-all: gramer main.cpp
+all: grammer main.cpp
 	g++ -std=c++11 -I./include -I./include/antlr -L./lib -o ./bin/hython main.cpp ./src/*.c ./src/*.cc -lantlr3c
 
-debug: gramer main.cpp
-	g++ -std=c++11 -DDEBUG -I./include -I./include/antlr -L./lib -o ./bin/hython main.cpp ./src/*.c ./src/*.cc -lantlr3c
+debug: grammer main.cpp
+	g++ -DDEBUG -std=c++11 -I./include -I./include/antlr -L./lib -o ./bin/hython main.cpp ./src/*.c ./src/*.cc -lantlr3c
 
-gramer: ./thirdpart/hython.g 
+grammer: ./thirdpart/hython.g
 	java -jar ./thirdpart/antlr-3.4-complete.jar ./thirdpart/hython.g
 	mv ./hython.tokens ./thirdpart/
 	mv ./thirdpart/*.c src/
@@ -14,3 +14,4 @@ run:
 	./bin/hython ./testdata/input1
 	./bin/hython ./testdata/input2
 	./bin/hython ./testdata/input3
+

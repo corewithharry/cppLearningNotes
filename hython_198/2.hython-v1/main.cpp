@@ -19,7 +19,7 @@ int main(int argc, char* argv[]) {
 
     ExprTreeEvaluator eval;
     int rr = eval.run(tree);
-    std::cout << "Evaluator result: " << rr << '\n';
+    //std::cout << "Evaluator result: " << rr << '\n';
     tree.destroy();
     return 0;
 }

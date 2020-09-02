@@ -119,8 +119,9 @@ int ExprTreeEvaluator::run(haizei::ASTNode tree) {
             return 0;
         }
         case FOR: {
-            for (run(tree[0]); run(tree[1]); run(tree[2])) {
-                run(tree[3]);
+            ExprTreeEvaluator new_this(this);
+            for (new_this.run(tree[0]); new_this.run(tree[1]); new_this.run(tree[2])) {
+                new_this.run(tree[3]);
             }
             return 0;
         }
@@ -158,4 +159,3 @@ int ExprTreeEvaluator::run(haizei::ASTNode tree) {
     }
     return 0;
 }
-

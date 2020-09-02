@@ -18,7 +18,6 @@
         j = j + 1;
     } while (j <= 10);
    
-    print i; //bug语句
+    //print i; //bug语句
     print a;
 }
-
