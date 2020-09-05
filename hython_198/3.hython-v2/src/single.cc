@@ -17,6 +17,10 @@ int MasterChainSingle::run(ASTNode node, std::shared_ptr<Parameter> &p) {
         ret = m->run(node, p);
         break;
     }
+    if (h == nullptr) throw std::runtime_error(
+        "not handle type : "
+        + std::to_string(node.type())
+    );
     return ret;
 }
 
