@@ -46,7 +46,7 @@ public :
         //赋值运算符。会先调用默认构造函数
         cout << "operator= : " << this << endl;
         this->x = a.x, this->y = a.y;
-        return ;
+        return 0;
     }
 
     void set(int x, int y) {
